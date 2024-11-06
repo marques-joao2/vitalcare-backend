@@ -34,16 +34,11 @@ public class UsuarioController {
         try {
             LoginResponseDTO response = usuarioService.realizarLogin(loginRequestDTO);
 
-            if (response == null) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new LoginResponseDTO("FAILED", "Usuário não encontrado", null));
+            if (response.getData() == null) {
+                return ResponseEntity.status(HttpStatus.OK).body(new LoginResponseDTO(response.getStatus(), response.getMessage(), null));
             }
 
-            if ("SUCCESS".equals(response.getStatus())) {
-                return ResponseEntity.status(HttpStatus.OK).body(response);
-            } else {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-            }
-
+            return ResponseEntity.status(HttpStatus.OK).body(response);
         } catch(Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new LoginResponseDTO("FAILED", "Erro interno no servidor", null));
         }
@@ -52,9 +47,18 @@ public class UsuarioController {
 
     @PostMapping("/{idUsuario}/sos")
     public ChamadaSOSResponseDTO acionarSOS(@PathVariable Long idUsuario) {
-
         return usuarioService.acionarSOS(idUsuario);
+    }
 
+    @DeleteMapping("/{idUsuario}")
+    public ResponseEntity<?> deletarConta(@PathVariable Long idUsuario) {
+        try {
+            usuarioService.deletarConta(idUsuario);
+
+            return ResponseEntity.noContent().build();
+        } catch(Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro interno no servidor");
+        }
     }
 
 }

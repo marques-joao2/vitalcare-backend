@@ -57,9 +57,17 @@ public class UsuarioService {
 
     public LoginResponseDTO realizarLogin(LoginRequestDTO loginRequestDTO) {
         try {
-            UsuarioEntity usuarioEntity = this.usuarioRepository.findByEmail(
-                    loginRequestDTO.getEmail()).orElseThrow(() -> new RuntimeException("Usuário não encontrado: " + loginRequestDTO.getEmail())
-            );
+//            UsuarioEntity usuarioEntity = this.usuarioRepository.findByEmail(
+//                    loginRequestDTO.getEmail()).orElseThrow(() -> new RuntimeException("Usuário não encontrado: " + loginRequestDTO.getEmail())
+//            );
+
+            Optional<UsuarioEntity> usuarioEntityOpt = this.usuarioRepository.findByEmail(loginRequestDTO.getEmail());
+
+            if (usuarioEntityOpt.isEmpty()) {
+                return new LoginResponseDTO("FAILED", "Usuário não encontrado", null);
+            }
+
+            UsuarioEntity usuarioEntity = usuarioEntityOpt.get();
 
             if (loginRequestDTO.getSenha().equals(usuarioEntity.getSenha())) {
                 UsuarioDTO usuarioDTO = new UsuarioDTO(
@@ -68,6 +76,7 @@ public class UsuarioService {
                         usuarioEntity.getEmail(),
                         usuarioEntity.getContatoEmergencia()
                 );
+
                 return new LoginResponseDTO("SUCCESS", "Login realizado com sucesso", usuarioDTO);
             } else {
                 return new LoginResponseDTO("FAILED", "Senha incorreta", null);
@@ -109,6 +118,14 @@ public class UsuarioService {
         } catch(Exception e) {
             System.out.println(">>>>>>>>>>> Deu ruim: " + e.getMessage());
             return null;
+        }
+    }
+
+    public void deletarConta(Long idUsuario) {
+        try {
+            usuarioRepository.deleteById(idUsuario);
+        }catch (Exception e) {
+            System.out.println(">>>>>>>>>>> Deu ruim: " + e.getMessage());
         }
     }
 

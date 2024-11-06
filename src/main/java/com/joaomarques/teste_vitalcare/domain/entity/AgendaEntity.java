@@ -24,7 +24,7 @@ public class AgendaEntity {
     @OneToMany(mappedBy = "agendaEntity")
     private List<EventoEntity> eventos;
 
-    @ManyToOne
+    @OneToOne
     @JsonIgnore
     @JoinColumn(name = "idUsuario", nullable = false)
     private UsuarioEntity usuarioEntity;
